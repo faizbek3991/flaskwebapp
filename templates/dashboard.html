@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="home-body">
+    <header class="topbar">
+        <a class="topbar-brand" href="{{ url_for('home') }}" aria-label="Flask Course Home">
+            <span class="brand-mark small">FC</span>
+            <span>Flask Course</span>
+        </a>
+        <nav class="topbar-nav" aria-label="Main navigation">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('dashboard') }}" aria-current="page">Dashboard</a>
+            <a href="{{ url_for('login') }}">Logout</a>
+        </nav>
+    </header>
+
+    <main class="dashboard">
+        <section class="welcome-band" aria-labelledby="dashboard-title">
+            <div>
+                <p class="eyebrow">Matplotlib report</p>
+                <h1 id="dashboard-title">Student Database Dashboard</h1>
+                <p class="welcome-copy">
+                    Course registrations, student status, and SQLite record growth.
+                </p>
+            </div>
+            <div class="status-tile" aria-label="Chart status">
+                <span class="status-dot"></span>
+                <strong>SQLite Linked</strong>
+                <small>Generated from records</small>
+            </div>
+        </section>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <section class="flash-stack" aria-label="System messages">
+                    {% for category, message in messages %}
+                        <div class="message {{ category }}" role="status">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        {% endwith %}
+
+        <section class="stat-grid" aria-label="Dashboard summary">
+            <article class="stat-card">
+                <span class="stat-label">Total Records</span>
+                <strong>{{ total_count }}</strong>
+                <p>Rows currently saved in the students table.</p>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">Active Students</span>
+                <strong>{{ active_count }}</strong>
+                <p>Records marked as active in SQLite.</p>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">Completed</span>
+                <strong>{{ completed_count }}</strong>
+                <p>Records marked as completed in SQLite.</p>
+            </article>
+        </section>
+
+        <section class="chart-panel" aria-label="SQLite student charts">
+            <img
+                class="dashboard-chart"
+                src="{{ url_for('dashboard_chart') }}"
+                alt="Student dashboard generated from SQLite data with course, status, and database growth charts"
+            >
+        </section>
+    </main>
+</body>
+</html>

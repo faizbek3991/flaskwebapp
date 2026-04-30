@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student CRUD Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="home-body">
+    <header class="topbar">
+        <a class="topbar-brand" href="{{ url_for('home') }}" aria-label="Flask Course Home">
+            <span class="brand-mark small">FC</span>
+            <span>Flask Course</span>
+        </a>
+        <nav class="topbar-nav" aria-label="Main navigation">
+            <a href="{{ url_for('home') }}" aria-current="page">Home</a>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('login') }}">Logout</a>
+        </nav>
+    </header>
+
+    <main class="dashboard">
+        <section class="welcome-band" aria-labelledby="home-title">
+            <div>
+                <p class="eyebrow">CRUD dashboard</p>
+                <h1 id="home-title">Student Records</h1>
+                <p class="welcome-copy">
+                    Manage course registrations and student progress.
+                </p>
+            </div>
+            <div class="status-tile" aria-label="Application status">
+                <span class="status-dot"></span>
+                <strong>System Online</strong>
+                <small>Errors handled gracefully</small>
+            </div>
+        </section>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <section class="flash-stack" aria-label="System messages">
+                    {% for category, message in messages %}
+                        <div class="message {{ category }}" role="status">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        {% endwith %}
+
+        <section class="stat-grid" aria-label="Dashboard summary">
+            <article class="stat-card">
+                <span class="stat-label">Total Records</span>
+                <strong>{{ total_count }}</strong>
+                <p>Student records currently stored in SQLite.</p>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">Active Students</span>
+                <strong>{{ active_count }}</strong>
+                <p>Students with active course progress.</p>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">Completed</span>
+                <strong>{{ completed_count }}</strong>
+                <p>Students who completed their course.</p>
+            </article>
+        </section>
+
+        <section class="crud-layout">
+            <aside class="dashboard-panel">
+                <h2>Create Record</h2>
+                <form class="crud-form" method="POST" action="{{ url_for('create_student') }}">
+                    <label for="name">Student Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter student name">
+
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="student@example.com">
+
+                    <label for="course">Course</label>
+                    <input type="text" id="course" name="course" placeholder="Enter course name">
+
+                    <label for="status">Status</label>
+                    <select id="status" name="status">
+                        <option value="Active">Active</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+
+                    <button type="submit">Create Student</button>
+                </form>
+            </aside>
+
+            <section class="records-section" aria-labelledby="records-title">
+                <div class="panel-heading">
+                    <h2 id="records-title">Student List</h2>
+                </div>
+
+                <div class="record-list">
+                    {% for student in students %}
+                        <article class="record-card">
+                            <div class="record-topline">
+                                <span class="record-id">#{{ student.id }}</span>
+                                <span class="status-pill {{ student.status | lower }}">
+                                    {{ student.status }}
+                                </span>
+                            </div>
+
+                            <form
+                                id="update-student-{{ student.id }}"
+                                class="record-form"
+                                method="POST"
+                                action="{{ url_for('update_student', student_id=student.id) }}"
+                            >
+                                <div class="form-row">
+                                    <label for="name-{{ student.id }}">Name</label>
+                                    <input
+                                        type="text"
+                                        id="name-{{ student.id }}"
+                                        name="name"
+                                        value="{{ student.name }}"
+                                    >
+                                </div>
+
+                                <div class="form-row">
+                                    <label for="email-{{ student.id }}">Email</label>
+                                    <input
+                                        type="email"
+                                        id="email-{{ student.id }}"
+                                        name="email"
+                                        value="{{ student.email }}"
+                                    >
+                                </div>
+
+                                <div class="form-row">
+                                    <label for="course-{{ student.id }}">Course</label>
+                                    <input
+                                        type="text"
+                                        id="course-{{ student.id }}"
+                                        name="course"
+                                        value="{{ student.course }}"
+                                    >
+                                </div>
+
+                                <div class="form-row">
+                                    <label for="status-{{ student.id }}">Status</label>
+                                    <select id="status-{{ student.id }}" name="status">
+                                        <option value="Active" {% if student.status == "Active" %}selected{% endif %}>Active</option>
+                                        <option value="Pending" {% if student.status == "Pending" %}selected{% endif %}>Pending</option>
+                                        <option value="Completed" {% if student.status == "Completed" %}selected{% endif %}>Completed</option>
+                                    </select>
+                                </div>
+                            </form>
+
+                            <div class="record-actions">
+                                <button
+                                    class="secondary-button"
+                                    type="submit"
+                                    form="update-student-{{ student.id }}"
+                                >
+                                    Update
+                                </button>
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('delete_student', student_id=student.id) }}"
+                                >
+                                    <button class="danger-button" type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </article>
+                    {% else %}
+                        <div class="empty-state">
+                            <h3>No records yet</h3>
+                            <p>The student list is empty.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </section>
+    </main>
+</body>
+</html>

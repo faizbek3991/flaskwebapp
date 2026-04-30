@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <main class="login-shell">
+        <section class="login-panel" aria-labelledby="login-title">
+            <div class="brand-mark">FC</div>
+            <h1 id="login-title">Sign in</h1>
+            <p class="subtitle">Access your Flask practice dashboard.</p>
+
+            {% if message %}
+                <div class="message {{ message_type }}" role="status">
+                    {{ message }}
+                </div>
+            {% endif %}
+
+            <form method="POST" action="/" class="login-form">
+                <label for="username">Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Enter username"
+                    autocomplete="username"
+                >
+
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter password"
+                    autocomplete="current-password"
+                >
+
+                <button type="submit">Log in</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
